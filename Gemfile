@@ -7,4 +7,4 @@ gem 'chronic'
 gem 'pry-byebug'
 gem 'selenium-webdriver'
 gem "chromedriver-helper"
-
+gem 'launchy'

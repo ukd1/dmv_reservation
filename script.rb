@@ -8,7 +8,12 @@ require 'pry-byebug'
 require 'yaml'
 
 def debug?
-  ENV['DEBUG']
+  true
+end
+
+Capybara::Selenium::Driver.class_eval do
+  def reset!
+  end
 end
 
 if debug?
@@ -19,6 +24,10 @@ if debug?
   Capybara.default_driver = :selenium
 else
   Capybara.default_driver = :poltergeist
+  Capybara.register_driver :poltergeist do |app|
+    Capybara::Poltergeist::Driver.new(app, {debug: true})
+  end
+
   Capybara.javascript_driver = :poltergeist
 end
 
@@ -64,7 +73,7 @@ class Page
   end
 
   def fill_form
-    visit('https://www.dmv.ca.gov/foa/clear.do?goTo=officeVisit&localeName=en')
+    visit('https://www.dmv.ca.gov/wasapp/foa/clear.do?goTo=officeVisit&localeName=en')
 
     within('[name="ApptForm"]') do
       select data.office, from: 'officeId'
@@ -81,7 +90,8 @@ class Page
   end
 
   def next_available
-    date = all(:css, "p.alert")[1].text
+    fields = all(:css, "table tr p strong")
+    date = fields[1].text
     date = date.split(", ")[1..-1].join(" ")
     Chronic.parse(date).to_date
   end
