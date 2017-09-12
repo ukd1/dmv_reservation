@@ -38,6 +38,7 @@ class Page
     while true
       begin
         fill_form
+        # save_and_open_page('dmv.html')
 
         puts "Next Available #{next_available}"
 
@@ -61,7 +62,7 @@ class Page
 
   def fill_form
     visit('https://www.dmv.ca.gov/wasapp/foa/clear.do?goTo=officeVisit&localeName=en')
-
+    sleep 2
     within('[name="ApptForm"]') do
       select data.office, from: 'officeId'
       choose '1 item'
@@ -85,8 +86,8 @@ class Page
 
   def next_available
     fields = all(:css, "table tr p strong")
-    date = fields[1].text
-    puts date
+    date = fields[0].text
+    # puts date
     date = date.split(", ")[1..-1].join(" ")
     Chronic.parse(date).to_date
   end
