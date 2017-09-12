@@ -11,26 +11,12 @@ def debug?
   true
 end
 
-Capybara::Selenium::Driver.class_eval do
-  def reset!
-  end
+
+Capybara.register_driver :selenium do |app|
+  Capybara::Selenium::Driver.new(app, :browser => :chrome)
 end
 
-if debug?
-  Capybara.register_driver :selenium do |app|
-    Capybara::Selenium::Driver.new(app, :browser => :chrome)
-  end
-
-  Capybara.default_driver = :selenium
-else
-  Capybara.default_driver = :poltergeist
-  Capybara.register_driver :poltergeist do |app|
-    Capybara::Poltergeist::Driver.new(app, {debug: true})
-  end
-
-  Capybara.javascript_driver = :poltergeist
-end
-
+Capybara.default_driver = :selenium
 
 class Page
   include Capybara::DSL
@@ -70,6 +56,7 @@ class Page
   def book_apointment
     click_button "Schedule Appointment Selected"
     click_button "Confirm"
+    send_email_confirmation
   end
 
   def fill_form
@@ -89,9 +76,17 @@ class Page
     click_button 'Submit'
   end
 
+  def send_email_confirmation
+    fill_in 'emailAdd', with: data.email
+    
+    click_button 'Send Email Confirmation'
+  end
+
+
   def next_available
     fields = all(:css, "table tr p strong")
     date = fields[1].text
+    puts date
     date = date.split(", ")[1..-1].join(" ")
     Chronic.parse(date).to_date
   end
