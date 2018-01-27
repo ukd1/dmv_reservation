@@ -11,16 +11,14 @@ def debug?
   true
 end
 
-
 Capybara.register_driver :selenium do |app|
-  Capybara::Selenium::Driver.new(app, :browser => :chrome)
+  Capybara::Selenium::Driver.new(app, browser: :chrome)
 end
 
 Capybara.default_driver = :selenium
 
 class Page
   include Capybara::DSL
-
 
   attr_reader :data
 
@@ -55,8 +53,8 @@ class Page
   end
 
   def book_apointment
-    click_button "Schedule Appointment Selected"
-    click_button "Confirm"
+    click_button 'Schedule Appointment Selected'
+    click_button 'Confirm'
     send_email_confirmation
   end
 
@@ -79,16 +77,15 @@ class Page
 
   def send_email_confirmation
     fill_in 'emailAdd', with: data.email
-    
+
     click_button 'Send Email Confirmation'
   end
 
-
   def next_available
-    fields = all(:css, "table tr p strong")
+    fields = all(:css, 'table tr p strong')
     date = fields[0].text
     # puts date
-    date = date.split(", ")[1..-1].join(" ")
+    date = date.split(', ')[1..-1].join(' ')
     Chronic.parse(date).to_date
   end
 end
@@ -108,7 +105,7 @@ class ConfigData < OpenStruct
   end
 
   def tell_parts
-    tel.split("-")
+    tel.split('-')
   end
 
   def tel_area
@@ -124,8 +121,7 @@ class ConfigData < OpenStruct
   end
 end
 
-data = ConfigData.from_file("data.yml")
+data = ConfigData.from_file('data.yml')
 Page.new(data).perform
 
 puts 'done'
-
